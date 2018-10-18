@@ -1,30 +1,36 @@
-FROM alpine:edge
+FROM alpine:3.8
 
-MAINTAINER xujinkai <jack777@xujinkai.net>
+ARG ARIA2_VER=1.34.0-r0
+ARG ARIANG_LINK=https://github.com/mayswind/AriaNg/releases/download/0.5.0/AriaNg-0.5.0.zip
 
 RUN apk update && \
 	apk add --no-cache --update bash && \
 	mkdir -p /conf && \
-	mkdir -p /conf-copy && \
+	mkdir -p /conf-default && \
 	mkdir -p /data && \
-	apk add --no-cache --update aria2 && \
-	apk add git && \
-	git clone https://github.com/ziahamza/webui-aria2 /aria2-webui && \
-    rm /aria2-webui/.git* -rf && \
-    apk del git && \
-	apk add --update darkhttpd
+	apk add --update aria2=${ARIA2_VER} && \
+	apk add --update curl && \
+	curl -L ${ARIANG_LINK} --output AriaNg.zip && \
+	mkdir AriaNg && \
+        unzip AriaNg.zip -d AriaNg && \
+	rm AriaNg.zip && \
+    	apk del curl && \
+	apk add --update darkhttpd && \
+	rm -rf /var/cache/apk/*
 
-ADD files/start.sh /conf-copy/start.sh
-ADD files/aria2.conf /conf-copy/aria2.conf
-ADD files/on-complete.sh /conf-copy/on-complete.sh
+ADD start.sh /start.sh
+RUN chmod +x /start.sh
 
-RUN chmod +x /conf-copy/start.sh
+ADD default/aria2.conf /conf-default/aria2.conf
+ADD default/on-complete.sh /conf-default/on-complete.sh
 
 WORKDIR /
+
 VOLUME ["/data"]
 VOLUME ["/conf"]
+
 EXPOSE 6800
 EXPOSE 80
 EXPOSE 8080
 
-CMD ["/conf-copy/start.sh"]
+CMD ["/start.sh"]

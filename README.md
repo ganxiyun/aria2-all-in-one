@@ -1,11 +1,14 @@
-Aria2 with webui
----
-Only 29Mb.  
-Edit config file out of the image.  
+# Overview
+It provides a all-in-one package as Docker for aria2 and AriaNG (WebUI for aria2).
+
+## Highlight
++ 29Mb.  
++ Edit config file out of the image.  
 Move file completed to another folder.  
 (Tasks that contains more than one files will not be moved.)  
 
-### Install
+# Installation
+## Installation on Linux with Docker installed
 I. replace **/DOWNLOAD_DIR** and **/CONFIG_DIR** for save data, and **YOUR_SECRET_CODE** for security. Run command below  
 ```
 sudo docker run -d \
@@ -21,11 +24,7 @@ xujinkai/aria2-with-webui
   
 II. Open `http://serverip:6880/` for aria2-webui, open `http://serverip:6888/` to browse data folder.  
 
-### Build:  
+## Installation on QNAP
+
+# Build 
 `sudo docker build -f Dockerfile -t xujinkai/aria2-with-webui .`  
-
-### Link:  
-https://github.com/aria2/aria2  
-https://github.com/ziahamza/webui-aria2  
-
-https://github.com/acgotaku/BaiduExporter  
