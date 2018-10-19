@@ -1,10 +1,14 @@
 #!/bin/sh 
 
+export TEMP_DIR="/data/_dl"
+
 if [ ! -f /conf/aria2.conf ]; then
 	cp /conf-default/aria2.conf /conf/aria2.conf
 	if [ $SECRET ]; then
 		echo "rpc-secret=${SECRET}" >> /conf/aria2.conf
 	fi
+	
+	echo "dir=${TEMP_DIR}" >> /conf/aria2.conf
 fi
 
 if [ ! -f /conf/on-complete.sh ]; then
@@ -17,14 +21,17 @@ touch /conf/aria2.session
 EXIT_CODE_SIGTERM=143
 
 SIG_handler () {
-	if [ -n $AriaNG_PID ]; then
-		kill -s SIGTERM $AriaNG_PID
+	if [ -n ${AriaNG_PID} ]; then
+		kill -s SIGTERM ${AriaNG_PID}
+		wait ${AriaNG_PID}
 	fi
-	if [ -n $AriaData_PID ]; then
-		kill -s SIGTERM $AriaData_PID
+	if [ -n ${AriaData_PID} ]; then
+		kill -s SIGTERM ${AriaData_PID}
+		wait ${AriaData_PID}
 	fi
-	if [ -n $Aria2c_PID ]; then
-		kill -s SIGTERM $Aria2c_PID
+	if [ -n ${Aria2c_PID} ]; then
+		kill -s SIGTERM ${Aria2c_PID}
+		wait ${Aria2c_PID}
 	fi
 }
 
@@ -39,5 +46,6 @@ AriaData_PID=$!
 aria2c --conf-path=/conf/aria2.conf &
 Aria2c_PID=$!
 
-wait $Aria2c_PID
-
+while kill -0 ${Aria2c_PID} > /dev/null 2>&1; do
+	wait ${Aria2c_PID}
+done
